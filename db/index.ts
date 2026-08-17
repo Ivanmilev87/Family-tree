@@ -44,6 +44,7 @@ export async function ensureDb() {
       label text NOT NULL, value text NOT NULL, position integer DEFAULT 0 NOT NULL
     )`),
     env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_person_fields_person_position ON person_fields (person_id, position)"),
+    env.DB.prepare("CREATE TABLE IF NOT EXISTS family_settings (id integer PRIMARY KEY NOT NULL, background_key text, updated_at text DEFAULT CURRENT_TIMESTAMP NOT NULL)"),
     env.DB.prepare("PRAGMA optimize"),
   ]);
   return getDb();

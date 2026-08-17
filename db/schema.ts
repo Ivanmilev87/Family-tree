@@ -34,3 +34,9 @@ export const personFields = sqliteTable("person_fields", {
   value: text("value").notNull(),
   position: integer("position").notNull().default(0),
 }, (table) => [index("idx_person_fields_person_position").on(table.personId, table.position)]);
+
+export const familySettings = sqliteTable("family_settings", {
+  id: integer("id").primaryKey(),
+  backgroundKey: text("background_key"),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
