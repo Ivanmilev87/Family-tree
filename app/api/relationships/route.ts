@@ -19,7 +19,7 @@ export async function POST(request:Request){
     const relatedPeople=await db.select({id:people.id}).from(people).where(eq(people.id,relatedPersonId));
     if(!existingPeople.length||!relatedPeople.length)return Response.json({error:"Човекът не е намерен."},{status:404,headers});
     const existing=await db.select().from(relationships).where(and(eq(relationships.personId,personId),eq(relationships.relatedPersonId,relatedPersonId),eq(relationships.type,type as "parent"|"partner")));
-    if(existing.length)return Response.json({relationship:existing[0]},{headers});
+    if(existing.length){const [relationship]=await db.update(relationships).set({eventLabel:clean(body.eventLabel,100)}).where(eq(relationships.id,existing[0].id)).returning();return Response.json({relationship},{headers});}
     const [relationship]=await db.insert(relationships).values({personId,relatedPersonId,type:type as "parent"|"partner",eventLabel:clean(body.eventLabel,100)}).returning();
     return Response.json({relationship},{status:201,headers});
   }catch(error){return Response.json({error:error instanceof Error?error.message:"Неуспешно записване"},{status:500,headers})}
