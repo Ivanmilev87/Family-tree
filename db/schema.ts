@@ -21,3 +21,11 @@ export const relationships = sqliteTable("relationships", {
   uniqueIndex("idx_relationships_unique").on(table.personId, table.relatedPersonId, table.type),
   index("idx_relationships_related").on(table.relatedPersonId, table.type),
 ]);
+
+export const personFields = sqliteTable("person_fields", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  personId: integer("person_id").notNull().references(() => people.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),
+  value: text("value").notNull(),
+  position: integer("position").notNull().default(0),
+}, (table) => [index("idx_person_fields_person_position").on(table.personId, table.position)]);
