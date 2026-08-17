@@ -3,7 +3,8 @@ import { ensureDb } from "../../../db";
 import { people, personFields, relationships } from "../../../db/schema";
 
 export const dynamic = "force-dynamic";
-const headers = { "Cache-Control": "private, no-store" };
+const headers = { "Cache-Control": "private, no-store", "Access-Control-Allow-Origin":"*", "Access-Control-Allow-Headers":"content-type", "Access-Control-Allow-Methods":"GET, POST, PATCH, OPTIONS" };
+export const OPTIONS=()=>new Response(null,{status:204,headers});
 const clean = (value: unknown, max=1000) => typeof value === "string" ? value.trim().slice(0,max) : "";
 const year = (value: unknown) => { const n=Number(value); return Number.isInteger(n)&&n>=1700&&n<=2100?n:null };
 const customFields = (value:unknown) => Array.isArray(value) ? value.slice(0,30).map((field,index)=>{
