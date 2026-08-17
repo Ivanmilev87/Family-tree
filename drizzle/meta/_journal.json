@@ -15,6 +15,13 @@
       "when": 1786953539375,
       "tag": "0001_gray_madrox",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1786956663666,
+      "tag": "0002_polite_slipstream",
+      "breakpoints": true
     }
   ]
 }

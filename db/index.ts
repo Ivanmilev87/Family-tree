@@ -26,6 +26,15 @@ export async function ensureDb() {
       created_at text DEFAULT CURRENT_TIMESTAMP NOT NULL
     )`),
     env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_people_generation_birth ON people (generation, birth_year)"),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS relationships (
+      id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+      person_id integer NOT NULL REFERENCES people(id) ON DELETE CASCADE,
+      related_person_id integer NOT NULL REFERENCES people(id) ON DELETE CASCADE,
+      type text NOT NULL CHECK(type IN ('parent','partner')),
+      created_at text DEFAULT CURRENT_TIMESTAMP NOT NULL
+    )`),
+    env.DB.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_relationships_unique ON relationships (person_id, related_person_id, type)"),
+    env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_relationships_related ON relationships (related_person_id, type)"),
     env.DB.prepare("PRAGMA optimize"),
   ]);
   return getDb();

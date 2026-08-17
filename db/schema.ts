@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const people = sqliteTable("people", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -10,3 +10,14 @@ export const people = sqliteTable("people", {
   healthNotes: text("health_notes").notNull().default(""), healthPrivate: integer("health_private").notNull().default(1),
   photoKey: text("photo_key"), createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 }, (table) => [index("idx_people_generation_birth").on(table.generation, table.birthYear)]);
+
+export const relationships = sqliteTable("relationships", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  personId: integer("person_id").notNull().references(() => people.id, { onDelete: "cascade" }),
+  relatedPersonId: integer("related_person_id").notNull().references(() => people.id, { onDelete: "cascade" }),
+  type: text("type", { enum: ["parent", "partner"] }).notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  uniqueIndex("idx_relationships_unique").on(table.personId, table.relatedPersonId, table.type),
+  index("idx_relationships_related").on(table.relatedPersonId, table.type),
+]);

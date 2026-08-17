@@ -1,6 +1,6 @@
 import { asc, eq } from "drizzle-orm";
 import { ensureDb } from "../../../db";
-import { people } from "../../../db/schema";
+import { people, relationships } from "../../../db/schema";
 
 export const dynamic = "force-dynamic";
 const headers = { "Cache-Control": "private, no-store" };
@@ -11,7 +11,8 @@ export async function GET() {
   try {
     const db=await ensureDb();
     const rows=await db.select().from(people).orderBy(asc(people.generation),asc(people.birthYear),asc(people.id));
-    return Response.json({people:rows},{headers});
+    const links=await db.select().from(relationships).orderBy(asc(relationships.id));
+    return Response.json({people:rows,relationships:links},{headers});
   } catch (error) {
     return Response.json({error:error instanceof Error?error.message:"Неуспешно зареждане"},{status:500,headers});
   }
