@@ -16,6 +16,11 @@ export const relationships = sqliteTable("relationships", {
   personId: integer("person_id").notNull().references(() => people.id, { onDelete: "cascade" }),
   relatedPersonId: integer("related_person_id").notNull().references(() => people.id, { onDelete: "cascade" }),
   type: text("type", { enum: ["parent", "partner"] }).notNull(),
+  story: text("story").notNull().default(""),
+  eventLabel: text("event_label").notNull().default(""),
+  eventDate: text("event_date").notNull().default(""),
+  place: text("place").notNull().default(""),
+  sourceUrl: text("source_url").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 }, (table) => [
   uniqueIndex("idx_relationships_unique").on(table.personId, table.relatedPersonId, table.type),

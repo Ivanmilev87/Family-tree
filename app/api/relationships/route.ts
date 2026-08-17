@@ -3,8 +3,9 @@ import { ensureDb } from "../../../db";
 import { people, relationships } from "../../../db/schema";
 
 export const dynamic = "force-dynamic";
-const headers={"Cache-Control":"private, no-store","Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"content-type","Access-Control-Allow-Methods":"POST, OPTIONS"};
+const headers={"Cache-Control":"private, no-store","Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"content-type","Access-Control-Allow-Methods":"POST, PATCH, OPTIONS"};
 export const OPTIONS=()=>new Response(null,{status:204,headers});
+const clean=(value:unknown,max=1500)=>typeof value==="string"?value.trim().slice(0,max):"";
 
 export async function POST(request:Request){
   try{
@@ -22,4 +23,15 @@ export async function POST(request:Request){
     const [relationship]=await db.insert(relationships).values({personId,relatedPersonId,type:type as "parent"|"partner"}).returning();
     return Response.json({relationship},{status:201,headers});
   }catch(error){return Response.json({error:error instanceof Error?error.message:"Неуспешно записване"},{status:500,headers})}
+}
+
+export async function PATCH(request:Request){
+  try{
+    const body=await request.json() as Record<string,unknown>,id=Number(body.id);
+    if(!Number.isInteger(id))return Response.json({error:"Липсва семейна връзка."},{status:400,headers});
+    const db=await ensureDb();
+    const [relationship]=await db.update(relationships).set({story:clean(body.story,2500),eventLabel:clean(body.eventLabel,100),eventDate:clean(body.eventDate,80),place:clean(body.place,150),sourceUrl:clean(body.sourceUrl,500)}).where(eq(relationships.id,id)).returning();
+    if(!relationship)return Response.json({error:"Връзката не е намерена."},{status:404,headers});
+    return Response.json({relationship},{headers});
+  }catch(error){return Response.json({error:error instanceof Error?error.message:"Неуспешно обновяване"},{status:500,headers})}
 }

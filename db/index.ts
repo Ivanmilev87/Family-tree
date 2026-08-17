@@ -31,6 +31,9 @@ export async function ensureDb() {
       person_id integer NOT NULL REFERENCES people(id) ON DELETE CASCADE,
       related_person_id integer NOT NULL REFERENCES people(id) ON DELETE CASCADE,
       type text NOT NULL CHECK(type IN ('parent','partner')),
+      story text DEFAULT '' NOT NULL, event_label text DEFAULT '' NOT NULL,
+      event_date text DEFAULT '' NOT NULL, place text DEFAULT '' NOT NULL,
+      source_url text DEFAULT '' NOT NULL,
       created_at text DEFAULT CURRENT_TIMESTAMP NOT NULL
     )`),
     env.DB.prepare("CREATE UNIQUE INDEX IF NOT EXISTS idx_relationships_unique ON relationships (person_id, related_person_id, type)"),
