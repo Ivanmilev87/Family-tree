@@ -2,7 +2,7 @@ name: Publish family tree to GitHub Pages
 
 on:
   push:
-    branches: [agent/build-family-memory-app]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
