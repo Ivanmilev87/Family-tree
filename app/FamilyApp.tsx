@@ -21,7 +21,7 @@ const demo: Person[] = [
   {id:10,firstName:"Николай",lastName:"Милев",birthYear:1972,deathYear:null,generation:3,branch:"Милеви",relation:"син",description:"Пази семейните документи.",story:"Открил актове за раждане от началото на XX век.",traits:"история,постоянство",healthNotes:"",healthPrivate:1,photoKey:null},
 ];
 
-const genNames = ["Прапрабаби и прапрадядовци","Прабаби и прадядовци","Баби и дядовци","Родители","Деца","Най-младо поколение"];
+const genNames = ["I поколение · най-старо записано","II поколение","III поколение","IV поколение","V поколение","VI поколение"];
 const tone = ["sage","amber","rose","blue"];
 const initials = (p: Person) => `${p.firstName[0] ?? ""}${p.lastName[0] ?? ""}`;
 const years = (p: Person) => `${p.birthYear ?? "?"}${p.deathYear ? ` – ${p.deathYear}` : ""}`;
