@@ -1,0 +1,31 @@
+import { sql } from "drizzle-orm";
+import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+
+export const people = sqliteTable("people", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  firstName: text("first_name").notNull(), lastName: text("last_name").notNull(),
+  birthYear: integer("birth_year"), deathYear: integer("death_year"), generation: integer("generation").notNull().default(0),
+  branch: text("branch").notNull().default(""), relation: text("relation").notNull().default(""),
+  description: text("description").notNull().default(""), story: text("story").notNull().default(""), traits: text("traits").notNull().default(""),
+  healthNotes: text("health_notes").notNull().default(""), healthPrivate: integer("health_private").notNull().default(1),
+  photoKey: text("photo_key"), createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [index("idx_people_generation_birth").on(table.generation, table.birthYear)]);
+
+export const relationships = sqliteTable("relationships", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  personId: integer("person_id").notNull().references(() => people.id, { onDelete: "cascade" }),
+  relatedPersonId: integer("related_person_id").notNull().references(() => people.id, { onDelete: "cascade" }),
+  type: text("type", { enum: ["parent", "partner"] }).notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  uniqueIndex("idx_relationships_unique").on(table.personId, table.relatedPersonId, table.type),
+  index("idx_relationships_related").on(table.relatedPersonId, table.type),
+]);
+
+export const personFields = sqliteTable("person_fields", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  personId: integer("person_id").notNull().references(() => people.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),
+  value: text("value").notNull(),
+  position: integer("position").notNull().default(0),
+}, (table) => [index("idx_person_fields_person_position").on(table.personId, table.position)]);

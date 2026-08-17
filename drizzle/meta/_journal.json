@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1786953476831,
+      "tag": "0000_red_may_parker",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1786953539375,
+      "tag": "0001_gray_madrox",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1786956663666,
+      "tag": "0002_polite_slipstream",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1786958111046,
+      "tag": "0003_youthful_the_professor",
+      "breakpoints": true
+    }
+  ]
+}
