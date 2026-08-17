@@ -43,6 +43,13 @@
       "when": 1786974492900,
       "tag": "0005_omniscient_mentallo",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1786976032397,
+      "tag": "0006_conscious_serpent_society",
+      "breakpoints": true
     }
   ]
 }

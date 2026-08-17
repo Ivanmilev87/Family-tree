@@ -45,6 +45,8 @@ export async function ensureDb() {
     )`),
     env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_person_fields_person_position ON person_fields (person_id, position)"),
     env.DB.prepare("CREATE TABLE IF NOT EXISTS family_settings (id integer PRIMARY KEY NOT NULL, background_key text, updated_at text DEFAULT CURRENT_TIMESTAMP NOT NULL)"),
+    env.DB.prepare("CREATE TABLE IF NOT EXISTS family_media (id integer PRIMARY KEY AUTOINCREMENT NOT NULL, person_id integer NOT NULL REFERENCES people(id) ON DELETE CASCADE, photo_key text NOT NULL, caption text DEFAULT '' NOT NULL, event_date text DEFAULT '' NOT NULL, created_at text DEFAULT CURRENT_TIMESTAMP NOT NULL)"),
+    env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_family_media_person_date ON family_media (person_id, event_date)"),
     env.DB.prepare("PRAGMA optimize"),
   ]);
   return getDb();

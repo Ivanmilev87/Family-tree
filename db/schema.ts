@@ -40,3 +40,10 @@ export const familySettings = sqliteTable("family_settings", {
   backgroundKey: text("background_key"),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const familyMedia = sqliteTable("family_media", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  personId: integer("person_id").notNull().references(() => people.id, { onDelete: "cascade" }),
+  photoKey: text("photo_key").notNull(), caption: text("caption").notNull().default(""), eventDate: text("event_date").notNull().default(""),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [index("idx_family_media_person_date").on(table.personId, table.eventDate)]);
