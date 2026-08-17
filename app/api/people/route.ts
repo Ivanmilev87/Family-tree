@@ -1,4 +1,4 @@
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { ensureDb } from "../../../db";
 import { people } from "../../../db/schema";
 
@@ -26,4 +26,14 @@ export async function POST(request:Request){
     const [person]=await db.insert(people).values({firstName,lastName,birthYear:year(body.birthYear),deathYear:year(body.deathYear),generation,branch:clean(body.branch,80),relation:clean(body.relation,120),description:clean(body.description,1500),story:clean(body.story,2000),traits:clean(body.traits,500),healthNotes:clean(body.healthNotes,1000),healthPrivate:1}).returning();
     return Response.json({person},{status:201,headers});
   }catch(error){return Response.json({error:error instanceof Error?error.message:"Неуспешно записване"},{status:500,headers})}
+}
+
+export async function PATCH(request:Request){
+  try{
+    const body=await request.json() as Record<string,unknown>, id=Number(body.id);
+    if(!Number.isInteger(id))return Response.json({error:"Липсва човек."},{status:400,headers});
+    const db=await ensureDb();
+    const [person]=await db.update(people).set({relation:clean(body.relation,120),description:clean(body.description,1500)}).where(eq(people.id,id)).returning();
+    return Response.json({person},{headers});
+  }catch(error){return Response.json({error:error instanceof Error?error.message:"Неуспешно обновяване"},{status:500,headers})}
 }
