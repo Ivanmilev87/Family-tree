@@ -3,7 +3,7 @@ import { env } from "cloudflare:workers";
 export const dynamic = "force-dynamic";
 type PhotoEnv={PHOTOS:R2Bucket;DB:D1Database};
 const platform=()=>env as unknown as PhotoEnv;
-const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET, POST, OPTIONS"};
+const cors={"Access-Control-Allow-Origin":"*","Access-Control-Allow-Methods":"GET, POST, DELETE, OPTIONS"};
 export const OPTIONS=()=>new Response(null,{status:204,headers:cors});
 
 export async function GET(request:Request){
@@ -24,3 +24,9 @@ export async function POST(request:Request){try{
   await platform().DB.prepare("INSERT INTO family_settings (id, background_key, updated_at) VALUES (1, ?, CURRENT_TIMESTAMP) ON CONFLICT(id) DO UPDATE SET background_key=excluded.background_key, updated_at=CURRENT_TIMESTAMP").bind(key).run();
   return Response.json({backgroundKey:key},{status:201,headers:{...cors,"Cache-Control":"no-store"}});
 }catch(error){return Response.json({error:error instanceof Error?error.message:"Неуспешно качване"},{status:500,headers:cors})}}
+
+export async function DELETE(){try{
+  await platform().DB.prepare("CREATE TABLE IF NOT EXISTS family_settings (id integer PRIMARY KEY NOT NULL, background_key text, updated_at text DEFAULT CURRENT_TIMESTAMP NOT NULL)").run();
+  await platform().DB.prepare("INSERT INTO family_settings (id, background_key, updated_at) VALUES (1, NULL, CURRENT_TIMESTAMP) ON CONFLICT(id) DO UPDATE SET background_key=NULL, updated_at=CURRENT_TIMESTAMP").run();
+  return Response.json({backgroundKey:null},{headers:{...cors,"Cache-Control":"no-store"}});
+}catch(error){return Response.json({error:error instanceof Error?error.message:"Неуспешно връщане на фона"},{status:500,headers:cors})}}
