@@ -7,6 +7,8 @@ const headers = { "Cache-Control": "private, no-store", "Access-Control-Allow-Or
 export const OPTIONS=()=>new Response(null,{status:204,headers});
 const clean = (value: unknown, max=1000) => typeof value === "string" ? value.trim().slice(0,max) : "";
 const year = (value: unknown) => { const n=Number(value); return Number.isInteger(n)&&n>=1700&&n<=2100?n:null };
+const gender = (value: unknown) => value === "female" || value === "male" ? value : "unspecified";
+const url = (value: unknown) => { const candidate=clean(value,500); if(!candidate)return ""; try { const parsed=new URL(candidate); return parsed.protocol === "http:" || parsed.protocol === "https:" ? parsed.toString() : ""; } catch { return ""; } };
 const customFields = (value:unknown) => Array.isArray(value) ? value.slice(0,30).map((field,index)=>{
   const item=field&&typeof field==="object"?field as Record<string,unknown>:{};
   return {label:clean(item.label,80),value:clean(item.value,500),position:index};
@@ -31,7 +33,7 @@ export async function POST(request:Request){
     if(!firstName||!lastName)return Response.json({error:"Името и фамилията са задължителни."},{status:400,headers});
     const generation=Math.min(12,Math.max(0,Number(body.generation)||0));
     const db=await ensureDb();
-    const [person]=await db.insert(people).values({firstName,lastName,birthYear:year(body.birthYear),deathYear:year(body.deathYear),generation,branch:clean(body.branch,80),relation:clean(body.relation,120),description:clean(body.description,1500),story:clean(body.story,2000),traits:clean(body.traits,500),healthNotes:clean(body.healthNotes,1000),healthPrivate:1}).returning();
+    const [person]=await db.insert(people).values({firstName,lastName,birthYear:year(body.birthYear),deathYear:year(body.deathYear),generation,branch:clean(body.branch,80),relation:clean(body.relation,120),description:clean(body.description,1500),story:clean(body.story,2000),traits:clean(body.traits,500),healthNotes:clean(body.healthNotes,1000),healthPrivate:1,gender:gender(body.gender),phone:clean(body.phone,80),email:clean(body.email,160),facebookUrl:url(body.facebookUrl),instagramUrl:url(body.instagramUrl),otherUrl:url(body.otherUrl)}).returning();
     const fields=customFields(body.customFields);
     if(fields.length)await db.insert(personFields).values(fields.map(field=>({...field,personId:person.id})));
     return Response.json({person:{...person,customFields:fields.map(({label,value})=>({label,value}))}},{status:201,headers});
@@ -45,7 +47,7 @@ export async function PATCH(request:Request){
     if(!firstName||!lastName)return Response.json({error:"Името и фамилията са задължителни."},{status:400,headers});
     const db=await ensureDb();
     const generation=Math.min(12,Math.max(0,Number(body.generation)||0));
-    const [person]=await db.update(people).set({firstName,lastName,birthYear:year(body.birthYear),deathYear:year(body.deathYear),generation,branch:clean(body.branch,80),relation:clean(body.relation,120),description:clean(body.description,1500),story:clean(body.story,2000),traits:clean(body.traits,500),healthNotes:clean(body.healthNotes,1000)}).where(eq(people.id,id)).returning();
+    const [person]=await db.update(people).set({firstName,lastName,birthYear:year(body.birthYear),deathYear:year(body.deathYear),generation,branch:clean(body.branch,80),relation:clean(body.relation,120),description:clean(body.description,1500),story:clean(body.story,2000),traits:clean(body.traits,500),healthNotes:clean(body.healthNotes,1000),gender:gender(body.gender),phone:clean(body.phone,80),email:clean(body.email,160),facebookUrl:url(body.facebookUrl),instagramUrl:url(body.instagramUrl),otherUrl:url(body.otherUrl)}).where(eq(people.id,id)).returning();
     if(!person)return Response.json({error:"Човекът не е намерен."},{status:404,headers});
     const fields=customFields(body.customFields);
     await db.delete(personFields).where(eq(personFields.personId,id));

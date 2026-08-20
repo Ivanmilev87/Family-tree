@@ -50,6 +50,13 @@
       "when": 1786976032397,
       "tag": "0006_conscious_serpent_society",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1787216307289,
+      "tag": "0007_early_sinister_six",
+      "breakpoints": true
     }
   ]
 }

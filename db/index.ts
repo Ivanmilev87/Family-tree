@@ -22,7 +22,11 @@ export async function ensureDb() {
       branch text DEFAULT '' NOT NULL, relation text DEFAULT '' NOT NULL,
       description text DEFAULT '' NOT NULL, story text DEFAULT '' NOT NULL,
       traits text DEFAULT '' NOT NULL, health_notes text DEFAULT '' NOT NULL,
-      health_private integer DEFAULT 1 NOT NULL, photo_key text,
+      health_private integer DEFAULT 1 NOT NULL,
+      gender text DEFAULT 'unspecified' NOT NULL, phone text DEFAULT '' NOT NULL,
+      email text DEFAULT '' NOT NULL, facebook_url text DEFAULT '' NOT NULL,
+      instagram_url text DEFAULT '' NOT NULL, other_url text DEFAULT '' NOT NULL,
+      photo_key text,
       created_at text DEFAULT CURRENT_TIMESTAMP NOT NULL
     )`),
     env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_people_generation_birth ON people (generation, birth_year)"),
@@ -49,5 +53,13 @@ export async function ensureDb() {
     env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_family_media_person_date ON family_media (person_id, event_date)"),
     env.DB.prepare("PRAGMA optimize"),
   ]);
+  const columnInfo=await env.DB.prepare("PRAGMA table_info(people)").all<{name:string}>();
+  const present=new Set((columnInfo.results||[]).map(column=>column.name));
+  const contactColumns:[string,string][]=[
+    ["gender","text DEFAULT 'unspecified' NOT NULL"],["phone","text DEFAULT '' NOT NULL"],["email","text DEFAULT '' NOT NULL"],
+    ["facebook_url","text DEFAULT '' NOT NULL"],["instagram_url","text DEFAULT '' NOT NULL"],["other_url","text DEFAULT '' NOT NULL"],
+  ];
+  const missing=contactColumns.filter(([name])=>!present.has(name));
+  if(missing.length)await env.DB.batch(missing.map(([name,definition])=>env.DB.prepare(`ALTER TABLE people ADD ${name} ${definition}`)));
   return getDb();
 }

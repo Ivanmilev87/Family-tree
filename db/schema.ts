@@ -8,6 +8,9 @@ export const people = sqliteTable("people", {
   branch: text("branch").notNull().default(""), relation: text("relation").notNull().default(""),
   description: text("description").notNull().default(""), story: text("story").notNull().default(""), traits: text("traits").notNull().default(""),
   healthNotes: text("health_notes").notNull().default(""), healthPrivate: integer("health_private").notNull().default(1),
+  gender: text("gender", { enum: ["female", "male", "unspecified"] }).notNull().default("unspecified"),
+  phone: text("phone").notNull().default(""), email: text("email").notNull().default(""),
+  facebookUrl: text("facebook_url").notNull().default(""), instagramUrl: text("instagram_url").notNull().default(""), otherUrl: text("other_url").notNull().default(""),
   photoKey: text("photo_key"), createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 }, (table) => [index("idx_people_generation_birth").on(table.generation, table.birthYear)]);
 
